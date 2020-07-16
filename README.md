@@ -2,6 +2,8 @@
 
 Jiraffe is a Mac app which generates alerts whenever a given Jira filter is updated.
 
+![Screenshot](/screenshot.png)
+
 ## Prerequisites
 
 Jiraffe is reading your Jira username & password from [Kutapada](https://github.com/keremkoseoglu/kutapada). So, you need to be a Kutapada user in order to use Jiraffe. Ensure that you have installed Kutapada & entered your Jira username & password there.
