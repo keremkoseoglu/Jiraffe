@@ -12,8 +12,8 @@ import Cocoa
 class Model {
     public var reader: JiraReader
     
-    init(app:NSApplication) {
-        self.reader = JiraReader(app:app)
+    init(app:NSApplication, filterOutput:FilterOutputModel) {
+        self.reader = JiraReader(app:app, filterOutput:filterOutput)
     }
 
     func schedule() {

@@ -14,10 +14,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     var window: NSWindow!
     var model: Model!
+    var filterOutput: FilterOutputModel!
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        model = Model(app:NSApp)
-        let contentView = ContentView(model:model)
+        filterOutput = FilterOutputModel()
+        model = Model(app: NSApp, filterOutput: filterOutput)
+        let contentView = ContentView(model:model, filterOutput: filterOutput)
         model.schedule()
         
         window = NSWindow(

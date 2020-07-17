@@ -18,7 +18,7 @@ struct Reply: Decodable {
     var issues: [Issue]
 }
 
-struct Filter: Decodable {
+struct Filter: Decodable{
     var name: String
     var url: String
     var replied: Bool
@@ -36,13 +36,15 @@ class JiraReader {
     private var KUTAPADA_CONFIG = "/Users/Kerem/Dropbox/Apps/kutapada/kutapada.json"
     private var KUTAPADA_KEY = "Ecz - Jira"
     private var JIRAFFE_CONFIG = "/Users/Kerem/Documents/etc/config/jiraffe.json"
-    private var filters = Filters(filters: [])
     private var jiraUser = ""
     private var jiraPass = ""
     private var app: NSApplication
+    private var filters = Filters(filters: [])
+    private var filterOutput: FilterOutputModel
     
-    init(app: NSApplication) {
+    init(app: NSApplication, filterOutput: FilterOutputModel) {
         self.app = app
+        self.filterOutput = filterOutput
         readJiraffeConfig()
         readKutapadaConfig()
     }
@@ -51,6 +53,11 @@ class JiraReader {
         do {
             let jsonData = try String(contentsOfFile: JIRAFFE_CONFIG).data(using: .utf8)
             self.filters = try JSONDecoder().decode(Filters.self, from: jsonData!)
+            
+            for filter in self.filters.filters {
+                let filterOutput = FilterOutput(name: filter.name, total: 0)
+                self.filterOutput.append(item:filterOutput)
+            }
         } catch {print(error)}
     }
     
@@ -107,12 +114,17 @@ class JiraReader {
     }
     
     func evaluateJiraReply(filter: Filter, reply: Reply) {
+        var thisItemCount = 0
+        
         for curIssue in reply.issues {
             var found = false
             for prevIssue in filter.prevReply.issues {
                 if prevIssue.id == curIssue.id {found=true}
             }
-            if !found {newItemCount += 1}
+            if !found {
+                newItemCount += 1
+                thisItemCount += 1
+            }
         }
         
         for i in 0..<filters.filters.count {
@@ -122,6 +134,7 @@ class JiraReader {
             }
         }
         
+        self.filterOutput.update(name: filter.name, total: thisItemCount)
         jiraReplyEvaluationCompleted()
     }
     
@@ -129,6 +142,7 @@ class JiraReader {
         for filter in filters.filters {
             if !filter.replied {return}
         }
+        
         if newItemCount > 1 {
             self.app.dockTile.badgeLabel = String(self.newItemCount)
         } else {
