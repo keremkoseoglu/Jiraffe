@@ -46,13 +46,16 @@ struct ContentView: View {
         VStack {
             Text("Jiraffe - written by Dr. Kerem Koseoglu")
             
-            Button(action: {
-                self.model.reader.newItemCount = 0
-                NSApp.dockTile.badgeLabel = ""
-                self.filterOutput.reset()
-                self.model.reader.openJira()
-            }) {
-                Text("Clear")
+            HStack {
+                Button(action: {
+                    self.model.reader.newItemCount = 0
+                    NSApp.dockTile.badgeLabel = ""
+                    self.filterOutput.reset()
+                }) {Text("Clear")}
+                
+                Button(action: {
+                    self.model.reader.openJira()
+                }) {Text("Jira")}
             }
             
             List() {
