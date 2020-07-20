@@ -41,6 +41,7 @@ class JiraReader {
     private var app: NSApplication
     private var filters = Filters(filters: [])
     private var filterOutput: FilterOutputModel
+    private var isReading = false
     
     init(app: NSApplication, filterOutput: FilterOutputModel) {
         self.app = app
@@ -81,6 +82,9 @@ class JiraReader {
     }
     
     func execute() {
+        if self.isReading {return}
+        self.isReading = true
+        
         for i in 0..<filters.filters.count {
             filters.filters[i].replied = false
         }
@@ -107,7 +111,8 @@ class JiraReader {
                 let jiraReply = try JSONDecoder().decode(Reply.self, from: data)
                 self.evaluateJiraReply(filter:filter, reply:jiraReply)
                } catch let error {
-                  print(error)
+                print(error)
+                self.isReading = false
                }
             }
         }.resume()
@@ -122,7 +127,7 @@ class JiraReader {
                 if prevIssue.id == curIssue.id {found=true}
             }
             if !found {
-                newItemCount += 1
+                self.newItemCount += 1
                 thisItemCount += 1
             }
         }
@@ -143,11 +148,13 @@ class JiraReader {
             if !filter.replied {return}
         }
         
-        if newItemCount > 1 {
+        if newItemCount > 0 {
             self.app.dockTile.badgeLabel = String(self.newItemCount)
         } else {
             self.app.dockTile.badgeLabel = ""
         }
+        
+        self.isReading = false
     }
     
     public func openJira() {

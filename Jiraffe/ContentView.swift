@@ -25,15 +25,15 @@ class FilterOutputModel: ObservableObject {
         for i in 0..<items.count {
             if items[i].name == name {
                 items[i].id = UUID()
-                items[i].total = total
+                items[i].total += total
                 return
             }
         }
     }
     
     public func reset() {
-        for item in items {
-            update(name: item.name, total: 0)
+        for i in 0..<items.count {
+            items[i].total = 0
         }
     }
 }

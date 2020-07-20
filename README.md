@@ -30,6 +30,8 @@ Create a file called "jiraffe.json" somewhere, which should have the following f
 
 Edit Jiraffe/JiraReader.swift so that JIRAFFE_CONFIG points to this configuration file.
 
+If you want to change the Jira check frequency, you can edit Jiraffe/Model.swift - schedule().
+
 ### Credential settings
 
 #### Alternative 1: Kutapada
