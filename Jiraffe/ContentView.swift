@@ -54,13 +54,17 @@ struct ContentView: View {
             
             HStack {
                 Button(action: {
+                    self.model.reader.execute()
+                }) {Text("👀")}
+                
+                Button(action: {
                     self.clearNotifications()
-                }) {Text("Clear")}
+                }) {Text("🧻")}
                 
                 Button(action: {
                     self.clearNotifications()
                     self.model.reader.openJira()
-                }) {Text("Jira")}
+                }) {Text("🌍")}
             }
             
             List() {
