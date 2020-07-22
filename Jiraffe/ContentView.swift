@@ -42,18 +42,23 @@ struct ContentView: View {
     public var model: Model
     @ObservedObject var filterOutput = FilterOutputModel()
     
+    func clearNotifications() {
+        self.model.reader.newItemCount = 0
+        NSApp.dockTile.badgeLabel = ""
+        self.filterOutput.reset()
+    }
+    
     var body: some View {
         VStack {
             Text("Jiraffe - written by Dr. Kerem Koseoglu")
             
             HStack {
                 Button(action: {
-                    self.model.reader.newItemCount = 0
-                    NSApp.dockTile.badgeLabel = ""
-                    self.filterOutput.reset()
+                    self.clearNotifications()
                 }) {Text("Clear")}
                 
                 Button(action: {
+                    self.clearNotifications()
                     self.model.reader.openJira()
                 }) {Text("Jira")}
             }
