@@ -38,20 +38,58 @@ class FilterOutputModel: ObservableObject {
     }
 }
 
+struct FilterDetail: Identifiable {
+    var id = UUID()
+    var name: String
+}
+
+class FilterDetailModel: ObservableObject {
+    @Published var items = [FilterDetail]()
+    
+    public func clear() {
+        items = [FilterDetail]()
+    }
+    
+    public func append(item:FilterDetail) {
+        items.append(item)
+    }
+}
+
 struct ContentView: View {
     public var model: Model
     @ObservedObject var filterOutput = FilterOutputModel()
+    @ObservedObject var filterDetail = FilterDetailModel()
     
     func clearNotifications() {
         self.model.reader.newItemCount = 0
         NSApp.dockTile.badgeLabel = ""
         self.filterOutput.reset()
+        filterDetail.clear()
+    }
+    
+    func itemSelected(name: String) {
+        filterDetail.clear()
+        for i in 0..<self.model.reader.filters.filters.count {
+            let filterCandidate = self.model.reader.filters.filters[i]
+            if filterCandidate.name == name {
+                for x in 0..<filterCandidate.prevReply.issues.count {
+                    let issue = filterCandidate.prevReply.issues[x]
+                    let name = issue.key + " - " + issue.fields.summary
+                    let newDetail = FilterDetail(id: UUID(), name: name)
+                    filterDetail.append(item: newDetail)
+                }
+            }
+        }
+        
+        #warning("message")
+        /*
+         sadece ID geliyor şu anda, biraz daha detay gelebilir
+         notif 1 olmasına rağmen detayda 2 gösterdi? detayları görünce anlayacağız
+         */
     }
     
     var body: some View {
         VStack {
-            Text("Jiraffe - written by Dr. Kerem Koseoglu")
-            
             HStack {
                 Button(action: {
                     self.model.reader.execute()
@@ -70,8 +108,19 @@ struct ContentView: View {
             List() {
                 ForEach (filterOutput.items) { item in
                     HStack {
+                        Button(action: {
+                            self.itemSelected(name: item.name)
+                        }) {Text("🔬")}
                         Text(item.name)
                         Text(String(item.total))
+                    }
+                }
+            }
+            
+            List() {
+                ForEach (filterDetail.items) { detailItem in
+                    HStack {
+                        Text(detailItem.name)
                     }
                 }
             }

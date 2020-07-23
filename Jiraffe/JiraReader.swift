@@ -9,8 +9,14 @@
 import Foundation
 import Cocoa
 
+struct IssueFields: Decodable {
+    var summary: String
+}
+
 struct Issue: Decodable {
     var id: String
+    var key: String
+    var fields: IssueFields
 }
 
 struct Reply: Decodable {
@@ -32,6 +38,7 @@ struct Filters: Decodable {
 
 class JiraReader {
     public var newItemCount = 0
+    public var filters = Filters(filters: [])
     
     private var KUTAPADA_CONFIG = "/Users/Kerem/Dropbox/Apps/kutapada/kutapada.json"
     private var KUTAPADA_KEY = "Ecz - Jira"
@@ -39,7 +46,6 @@ class JiraReader {
     private var jiraUser = ""
     private var jiraPass = ""
     private var app: NSApplication
-    private var filters = Filters(filters: [])
     private var filterOutput: FilterOutputModel
     private var isReading = false
     
