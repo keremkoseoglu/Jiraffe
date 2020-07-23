@@ -80,12 +80,6 @@ struct ContentView: View {
                 }
             }
         }
-        
-        #warning("message")
-        /*
-         sadece ID geliyor şu anda, biraz daha detay gelebilir
-         notif 1 olmasına rağmen detayda 2 gösterdi? detayları görünce anlayacağız
-         */
     }
     
     var body: some View {

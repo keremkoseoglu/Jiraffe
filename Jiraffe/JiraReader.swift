@@ -121,6 +121,9 @@ class JiraReader {
                 self.isReading = false
                }
             }
+            if error != nil {
+                self.isReading = false
+            }
         }.resume()
     }
     
