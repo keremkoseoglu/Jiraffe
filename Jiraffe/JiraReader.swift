@@ -141,6 +141,17 @@ class JiraReader {
             }
         }
         
+        for prevIssue in filter.prevReply.issues {
+            var found = false
+            for curIssue in reply.issues {
+                if prevIssue.id == curIssue.id {found=true}
+            }
+            if !found {
+                self.newItemCount -= 1
+                thisItemCount -= 1
+            }
+        }
+        
         for i in 0..<filters.filters.count {
             if filters.filters[i].name == filter.name {
                 filters.filters[i].replied = true
