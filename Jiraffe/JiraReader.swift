@@ -166,9 +166,20 @@ class JiraReader {
         self.isReading = false
     }
     
-    public func openJira() {
+    func getRootUrl() -> String {
         let randomUrl = self.filters.filters[0].url
         let rootUrl = randomUrl.components(separatedBy: "/rest")[0]
+        return rootUrl
+    }
+    
+    public func openJira() {
+        let rootUrl = self.getRootUrl()
         NSWorkspace.shared.open(URL(string: rootUrl)!)
+    }
+    
+    public func openJiraIssue(key: String) {
+        let rootUrl = self.getRootUrl()
+        let url = rootUrl + "/browse/" + key
+        NSWorkspace.shared.open(URL(string: url)!)
     }
 }

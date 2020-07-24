@@ -82,6 +82,11 @@ struct ContentView: View {
         }
     }
     
+    func detailSelected(name: String) {
+        let nameSplit = name.components(separatedBy: " - ")
+        self.model.reader.openJiraIssue(key: nameSplit[0])
+    }
+    
     var body: some View {
         VStack {
             HStack {
@@ -104,7 +109,7 @@ struct ContentView: View {
                     HStack {
                         Button(action: {
                             self.itemSelected(name: item.name)
-                        }) {Text("🔬")}
+                        }) {Text("🔍")}
                         Text(item.name)
                         Text(String(item.total))
                     }
@@ -114,6 +119,10 @@ struct ContentView: View {
             List() {
                 ForEach (filterDetail.items) { detailItem in
                     HStack {
+                        Button(action: {
+                            self.detailSelected(name: detailItem.name)
+                        }) {Text("🌍")}
+                        
                         Text(detailItem.name)
                     }
                 }
