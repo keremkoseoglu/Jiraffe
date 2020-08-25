@@ -18,7 +18,7 @@ class Model {
 
     func schedule() {
         reader.execute()
-        let _ = Timer.scheduledTimer(timeInterval: 300, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
+        let _ = Timer.scheduledTimer(timeInterval: 900, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: true)
     }
     
     @objc func fireTimer() {

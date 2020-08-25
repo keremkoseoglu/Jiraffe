@@ -159,6 +159,7 @@ class JiraReader {
         
         if newItemCount > 0 {
             self.app.dockTile.badgeLabel = String(self.newItemCount)
+            NSSound(named: "Purr")?.play()
         } else {
             self.app.dockTile.badgeLabel = ""
         }
