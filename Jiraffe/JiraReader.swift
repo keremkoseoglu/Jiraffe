@@ -114,8 +114,8 @@ class JiraReader {
         URLSession.shared.dataTask(with: request) { data, response, error in
            if let data = data {
                do {
-                let jiraReply = try JSONDecoder().decode(Reply.self, from: data)
-                self.evaluateJiraReply(filter:filter, reply:jiraReply)
+                var jiraReply = try JSONDecoder().decode(Reply.self, from: data)
+                self.evaluateJiraReply(filter:filter, reply:&jiraReply)
                } catch let error {
                 print(error)
                 self.isReading = false
@@ -127,10 +127,12 @@ class JiraReader {
         }.resume()
     }
     
-    func evaluateJiraReply(filter: Filter, reply: Reply) {
+    func evaluateJiraReply(filter: Filter, reply: inout Reply) {
         var thisItemCount = 0
+        var issueIndex = -1
         
         for curIssue in reply.issues {
+            issueIndex += 1
             var found = false
             for prevIssue in filter.prevReply.issues {
                 if prevIssue.id == curIssue.id {found=true}
@@ -138,6 +140,7 @@ class JiraReader {
             if !found {
                 self.newItemCount += 1
                 thisItemCount += 1
+                reply.issues[issueIndex].fields.summary = "🆕 " + curIssue.fields.summary
             }
         }
         
