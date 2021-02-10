@@ -140,7 +140,7 @@ class JiraReader {
             if !found {
                 self.newItemCount += 1
                 thisItemCount += 1
-                reply.issues[issueIndex].fields.summary = "🆕 " + curIssue.fields.summary
+                reply.issues[issueIndex].fields.summary = "🐣 " + curIssue.fields.summary
             }
         }
         
