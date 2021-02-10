@@ -110,8 +110,8 @@ struct ContentView: View {
                         Button(action: {
                             self.itemSelected(name: item.name)
                         }) {Text("🔍")}
-                        Text(item.name)
-                        Text(String(item.total))
+                        Text(item.name).font(.system(size: 20))
+                        Text(String(item.total)).font(.system(size: 20))
                     }
                 }
             }
@@ -123,7 +123,7 @@ struct ContentView: View {
                             self.detailSelected(name: detailItem.name)
                         }) {Text("🌍")}
                         
-                        Text(detailItem.name)
+                        Text(detailItem.name).font(.system(size: 20))
                     }
                 }
             }
