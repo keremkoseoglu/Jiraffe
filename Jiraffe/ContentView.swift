@@ -62,6 +62,7 @@ struct ContentView: View {
     
     func clearNotifications() {
         self.model.reader.newItemCount = 0
+        self.model.reader.clearDucks()
         NSApp.dockTile.badgeLabel = ""
         self.filterOutput.reset()
         filterDetail.clear()

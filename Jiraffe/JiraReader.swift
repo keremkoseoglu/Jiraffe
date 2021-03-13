@@ -48,6 +48,7 @@ class JiraReader {
     private var app: NSApplication
     private var filterOutput: FilterOutputModel
     private var isReading = false
+    private var duck = "🐣 "
     
     init(app: NSApplication, filterOutput: FilterOutputModel) {
         self.app = app
@@ -135,12 +136,15 @@ class JiraReader {
             issueIndex += 1
             var found = false
             for prevIssue in filter.prevReply.issues {
-                if prevIssue.id == curIssue.id {found=true}
+                if prevIssue.id == curIssue.id {
+                    found=true
+                    reply.issues[issueIndex].fields.summary = prevIssue.fields.summary // Preserve duck
+                }
             }
             if !found {
                 self.newItemCount += 1
                 thisItemCount += 1
-                reply.issues[issueIndex].fields.summary = "🐣 " + curIssue.fields.summary
+                reply.issues[issueIndex].fields.summary = duck + curIssue.fields.summary
             }
         }
         
@@ -185,5 +189,15 @@ class JiraReader {
         let rootUrl = self.getRootUrl()
         let url = rootUrl + "/browse/" + key
         NSWorkspace.shared.open(URL(string: url)!)
+    }
+    
+    public func clearDucks() {
+        for i in 0..<filters.filters.count {
+            var issueIndex = -1
+            for prevIssue in filters.filters[i].prevReply.issues {
+                issueIndex += 1
+                filters.filters[i].prevReply.issues[issueIndex].fields.summary = prevIssue.fields.summary.replacingOccurrences(of: duck, with: "")
+            }
+        }
     }
 }
