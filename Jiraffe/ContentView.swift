@@ -17,6 +17,10 @@ struct FilterOutput: Identifiable {
 class FilterOutputModel: ObservableObject {
     @Published var items = [FilterOutput]()
     
+    public var items2: [FilterOutput] {
+        get {return items}
+    }
+    
     public func append(item:FilterOutput) {
         items.append(item)
     }

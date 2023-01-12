@@ -89,15 +89,17 @@ class JiraReader {
     }
     
     func execute() {
-        if self.isReading {return}
-        self.isReading = true
-        
-        for i in 0..<filters.filters.count {
-            filters.filters[i].replied = false
-        }
-        
-        for i in 0..<filters.filters.count {
-            executeFilter(filter:filters.filters[i])
+        DispatchQueue.main.async{
+            if self.isReading {return}
+            self.isReading = true
+            
+            for i in 0..<self.filters.filters.count {
+                self.filters.filters[i].replied = false
+            }
+            
+            for i in 0..<self.filters.filters.count {
+                self.executeFilter(filter:self.filters.filters[i])
+            }
         }
     }
     
@@ -160,18 +162,20 @@ class JiraReader {
     }
     
     func jiraReplyEvaluationCompleted() {
-        for filter in filters.filters {
-            if !filter.replied {return}
+        DispatchQueue.main.sync {
+            for filter in filters.filters {
+                if !filter.replied {return}
+            }
+            
+            if newItemCount > 0 {
+                self.app.dockTile.badgeLabel = String(self.newItemCount)
+                NSSound(named: "Purr")?.play()
+            } else {
+                self.app.dockTile.badgeLabel = ""
+            }
+            
+            self.isReading = false
         }
-        
-        if newItemCount > 0 {
-            self.app.dockTile.badgeLabel = String(self.newItemCount)
-            NSSound(named: "Purr")?.play()
-        } else {
-            self.app.dockTile.badgeLabel = ""
-        }
-        
-        self.isReading = false
     }
     
     func getRootUrl() -> String {
