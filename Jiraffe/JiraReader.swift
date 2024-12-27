@@ -9,22 +9,22 @@
 import Foundation
 import Cocoa
 
-struct IssueFields: Decodable {
+public struct IssueFields: Decodable {
     var summary: String
 }
 
-struct Issue: Decodable {
+public struct Issue: Decodable {
     var id: String
     var key: String
     var fields: IssueFields
 }
 
-struct Reply: Decodable {
+public struct Reply: Decodable {
     var total: Int
     var issues: [Issue]
 }
 
-struct Filter: Decodable{
+public struct Filter: Decodable{
     var name: String
     var url: String
     var replied: Bool
@@ -32,63 +32,69 @@ struct Filter: Decodable{
     var prevReply: Reply
 }
 
-struct Filters: Decodable {
+public struct Filters: Decodable {
     var filters: [Filter]
 }
 
-class JiraReader {
+public struct JiraAccount: Decodable {
+    var webAlias: String
+    var url: String
+    var username: String
+    var password: String
+    var apiKey: String
+    var projects: [String]
+}
+
+public struct JiraAccounts: Decodable {
+    var accounts: [JiraAccount]
+    
+    public func getAccountByUrl(_ url: String) -> JiraAccount? {
+        var cleanUrl = url.replacingOccurrences(of: "http://", with: "")
+        cleanUrl = cleanUrl.replacingOccurrences(of: "https://", with: "")
+        let roots = cleanUrl.split(separator: "/").map { String($0) }
+        
+        return accounts.first { $0.url.contains(roots[0]) }
+    }
+    
+    public func getAccountByIssueKey(_ key: String) -> JiraAccount? {
+        let projects = key.split(separator: "-").map { String($0) }
+        return accounts.first { $0.projects.contains(projects[0]) }
+    }
+
+}
+
+public protocol TicketSystemReader {
+    var newItemCount: Int { get set }
+    var filters: Filters { get set }
+    
+    func execute()
+    func clearDucks()
+    func openJira()
+    func openJiraIssue(key: String)
+}
+
+
+
+public class MultiJiraReader: TicketSystemReader {
     public var newItemCount = 0
     public var filters = Filters(filters: [])
     
-    private var KUTAPADA_CONFIG = "/Users/Kerem/Dropbox/Apps/kutapada/kutapada.json"
-    private var KUTAPADA_KEY = "Ecz - Jira"
-    private var JIRAFFE_CONFIG = "/Users/Kerem/Documents/etc/config/jiraffe.json"
-    private var jiraUser = ""
-    private var jiraPass = ""
     private var app: NSApplication
     private var filterOutput: FilterOutputModel
     private var isReading = false
     private var duck = "🐣 "
+    private var JIRAFFE_CONFIG = "/Users/Kerem/Documents/etc/config/jiraffe.json"
+    private var ACC_CONFIG = "/Users/Kerem/Documents/etc/config/jiraffe_acc.json"
+    private var jiraAccounts = JiraAccounts(accounts: [])
     
     init(app: NSApplication, filterOutput: FilterOutputModel) {
         self.app = app
         self.filterOutput = filterOutput
         readJiraffeConfig()
-        readKutapadaConfig()
+        readAccConfig()
     }
     
-    func readJiraffeConfig() {
-        do {
-            let jsonData = try String(contentsOfFile: JIRAFFE_CONFIG).data(using: .utf8)
-            self.filters = try JSONDecoder().decode(Filters.self, from: jsonData!)
-            
-            for filter in self.filters.filters {
-                let filterOutput = FilterOutput(name: filter.name, total: 0)
-                self.filterOutput.append(item:filterOutput)
-            }
-        } catch {print(error)}
-    }
-    
-    func readKutapadaConfig() {
-        do {
-            let jsonData = try String(contentsOfFile: KUTAPADA_CONFIG)
-            let pwd = PasswordJsonParser()
-            pwd.parseJson(JsonText: jsonData)
-            let accounts = pwd.flatAccountList
-            
-            let key_length = KUTAPADA_KEY.count
-            
-            for account in accounts {
-                if account.name.count >= key_length && account.name.prefix(key_length) == KUTAPADA_KEY {
-                    let spl = account.name.components(separatedBy: " - ")
-                    self.jiraUser = spl[spl.count-1]
-                    self.jiraPass = account.credential
-                }
-            }
-        } catch {print(error)}
-    }
-    
-    func execute() {
+    public func execute() {
         DispatchQueue.main.async{
             if self.isReading {return}
             self.isReading = true
@@ -103,16 +109,71 @@ class JiraReader {
         }
     }
     
-    func executeFilter(filter: Filter) {
+    public func openJira() {
+        for acc in self.jiraAccounts.accounts {
+            NSWorkspace.shared.open(URL(string: acc.url)!)
+        }
+    }
+    
+    public func openJiraIssue(key: String) {
+        let account = self.jiraAccounts.getAccountByIssueKey(key)!
+        let url = account.url + "/browse/" + key
+        NSWorkspace.shared.open(URL(string: url)!)
+    }
+    
+    public func clearDucks() {
+        for i in 0..<filters.filters.count {
+            var issueIndex = -1
+            for prevIssue in filters.filters[i].prevReply.issues {
+                issueIndex += 1
+                filters.filters[i].prevReply.issues[issueIndex].fields.summary = prevIssue.fields.summary.replacingOccurrences(of: duck, with: "")
+            }
+        }
+    }
+    
+    private func readJiraffeConfig() {
+        do {
+            let jsonData = try String(contentsOfFile: JIRAFFE_CONFIG).data(using: .utf8)
+            
+            self.filters = try JSONDecoder().decode(Filters.self, from: jsonData!)
+            
+            for filter in self.filters.filters {
+                let filterOutput = FilterOutput(name: filter.name, total: 0)
+                self.filterOutput.append(item:filterOutput)
+            }
+            
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    private func readAccConfig() {
+        do {
+            let jsonData = try String(contentsOfFile: ACC_CONFIG).data(using: .utf8)
+            self.jiraAccounts = try JSONDecoder().decode(JiraAccounts.self, from: jsonData!)
+            
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    private func executeFilter(filter: Filter) {
         let url = URL(string: filter.url)!
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         
-        let loginString = String(format: "%@:%@", self.jiraUser, self.jiraPass)
-        let loginData = loginString.data(using: String.Encoding.utf8)!
-        let base64LoginString = loginData.base64EncodedString()
-         
-        request.addValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        let account = self.jiraAccounts.getAccountByUrl(filter.url)!
+        
+        if account.password != "" {
+            let loginString = String(format: "%@:%@", account.username, account.password)
+            let loginData = loginString.data(using: String.Encoding.utf8)!
+            let base64LoginString = loginData.base64EncodedString()
+            request.addValue("Basic \(base64LoginString)", forHTTPHeaderField: "Authorization")
+        } else {
+            let credentials = "\(account.username):\(account.apiKey)"
+            let encodedCredentials = credentials.data(using: .utf8)!.base64EncodedString()
+            request.addValue("Basic \(encodedCredentials)", forHTTPHeaderField: "Authorization")
+        }
          
         URLSession.shared.dataTask(with: request) { data, response, error in
            if let data = data {
@@ -130,7 +191,7 @@ class JiraReader {
         }.resume()
     }
     
-    func evaluateJiraReply(filter: Filter, reply: inout Reply) {
+    private func evaluateJiraReply(filter: Filter, reply: inout Reply) {
         var thisItemCount = 0
         var issueIndex = -1
         
@@ -161,7 +222,7 @@ class JiraReader {
         jiraReplyEvaluationCompleted()
     }
     
-    func jiraReplyEvaluationCompleted() {
+    private func jiraReplyEvaluationCompleted() {
         DispatchQueue.main.sync {
             for filter in filters.filters {
                 if !filter.replied {return}
@@ -175,33 +236,6 @@ class JiraReader {
             }
             
             self.isReading = false
-        }
-    }
-    
-    func getRootUrl() -> String {
-        let randomUrl = self.filters.filters[0].url
-        let rootUrl = randomUrl.components(separatedBy: "/rest")[0]
-        return rootUrl
-    }
-    
-    public func openJira() {
-        let rootUrl = self.getRootUrl()
-        NSWorkspace.shared.open(URL(string: rootUrl)!)
-    }
-    
-    public func openJiraIssue(key: String) {
-        let rootUrl = self.getRootUrl()
-        let url = rootUrl + "/browse/" + key
-        NSWorkspace.shared.open(URL(string: url)!)
-    }
-    
-    public func clearDucks() {
-        for i in 0..<filters.filters.count {
-            var issueIndex = -1
-            for prevIssue in filters.filters[i].prevReply.issues {
-                issueIndex += 1
-                filters.filters[i].prevReply.issues[issueIndex].fields.summary = prevIssue.fields.summary.replacingOccurrences(of: duck, with: "")
-            }
         }
     }
 }

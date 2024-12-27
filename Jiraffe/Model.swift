@@ -10,10 +10,10 @@ import Foundation
 import Cocoa
 
 class Model {
-    public var reader: JiraReader
+    public var reader: TicketSystemReader
     
-    init(app:NSApplication, filterOutput:FilterOutputModel) {
-        self.reader = JiraReader(app:app, filterOutput:filterOutput)
+    init(app:NSApplication, filterOutput:FilterOutputModel, reader:TicketSystemReader) {
+        self.reader = reader
     }
 
     func schedule() {

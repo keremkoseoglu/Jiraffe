@@ -14,7 +14,6 @@
 		0C7F05CD24B88F9A001DE694 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0C7F05CC24B88F9A001DE694 /* Preview Assets.xcassets */; };
 		0C7F05D024B88F9A001DE694 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0C7F05CE24B88F9A001DE694 /* Main.storyboard */; };
 		0C7F05D924B891AA001DE694 /* Model.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C7F05D824B891A9001DE694 /* Model.swift */; };
-		0CD7A18424C0995A00F16685 /* PasswordFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD7A18324C0995A00F16685 /* PasswordFile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,7 +27,6 @@
 		0C7F05D124B88F9A001DE694 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0C7F05D224B88F9A001DE694 /* Jiraffe.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Jiraffe.entitlements; sourceTree = "<group>"; };
 		0C7F05D824B891A9001DE694 /* Model.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Model.swift; sourceTree = "<group>"; };
-		0CD7A18324C0995A00F16685 /* PasswordFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PasswordFile.swift; path = "../../kutapada/kutapada-ios/kutapada-ios/data/PasswordFile.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,7 +59,6 @@
 		0C7F05C424B88F98001DE694 /* Jiraffe */ = {
 			isa = PBXGroup;
 			children = (
-				0CD7A18324C0995A00F16685 /* PasswordFile.swift */,
 				0C5E8AE224C0551A00C38D8A /* JiraReader.swift */,
 				0C7F05D824B891A9001DE694 /* Model.swift */,
 				0C7F05C524B88F98001DE694 /* AppDelegate.swift */,
@@ -158,7 +155,6 @@
 				0C7F05D924B891AA001DE694 /* Model.swift in Sources */,
 				0C7F05C824B88F98001DE694 /* ContentView.swift in Sources */,
 				0C7F05C624B88F98001DE694 /* AppDelegate.swift in Sources */,
-				0CD7A18424C0995A00F16685 /* PasswordFile.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -308,7 +304,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keremkoseoglu.Jiraffe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -332,7 +328,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.keremkoseoglu.Jiraffe;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

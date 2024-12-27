@@ -15,10 +15,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var window: NSWindow!
     var model: Model!
     var filterOutput: FilterOutputModel!
+    
+    private var reader: TicketSystemReader!
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         filterOutput = FilterOutputModel()
-        model = Model(app: NSApp, filterOutput: filterOutput)
+        self.reader = MultiJiraReader(app: NSApp, filterOutput:filterOutput) as TicketSystemReader
+        
+        model = Model(app: NSApp, filterOutput: filterOutput, reader: self.reader)
         let contentView = ContentView(model:model, filterOutput: filterOutput)
         model.schedule()
         
