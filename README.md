@@ -28,36 +28,34 @@ Create a file called "jiraffe.json" somewhere, which should have the following f
 }
 ```
 
-Edit Jiraffe/JiraReader.swift so that JIRAFFE_CONFIG points to this configuration file.
+Create a file called "jiraffe_acc.json" somewhere, which should have the following format:
+
+```
+{
+    "accounts": [
+        {
+            "webAlias": "Jira",
+            "url": "https://yourjiraserver.com",
+            "username": "username",
+            "password": "password",
+            "apiKey": "api_key",
+            "projects": [
+                "VOL"
+            ]
+        }
+    ]
+}
+```
+
+You need to fill the password field for basic authentication of on-premise servers and the apiKey field for API based access of Jira Cloud. More info for API key generation can be found here: https://id.atlassian.com/manage-profile/security/api-tokens
+
+Edit Jiraffe/JiraReader.swift so that JIRAFFE_CONFIG and ACC_CONFIG point to these configuration files.
 
 If you want to change the Jira check frequency, you can edit Jiraffe/Model.swift - schedule().
 
-### Credential settings
-
-#### Alternative 1: Kutapada
-
-Current version of Jiraffe is reading your Jira username & password from [Kutapada](https://github.com/keremkoseoglu/kutapada). If you like it that way, you need to be a Kutapada user in order to use Jiraffe. Ensure that you have installed Kutapada & entered your Jira username & password there.
-
-Edit Jiraffe/JiraReader.swift so that: 
-- KUTAPADA_CONFIG points to your Kutapada password file on your disk
-- KUTAPADA_KEY contains the key value for your Jira password
-
-#### Alternative 2: Hard Code
-
-If you don't want to use [Kutapada](https://github.com/keremkoseoglu/kutapada), you can simply edit Jiraffe/JiraReader.swift to:
-- Put your hard coded username & password into the variables jiraUser & jiraPass. You can also get creative and fill them using some other method.
-- Delete the function readKutapadaConfig and its references
-- Delete  KUTAPADA_* variables
-
 ### Build
 
-Build the project using XCode. 
-
-If you get an error about PasswordFile.swift;
-- If you are reading credentials from Kutapada, you need that file. It is hosted under [Kutapada](https://github.com/keremkoseoglu/kutapada). You can copy that file from there.
-- If you aren't using Kutapada, you can simply remove PasswordFile.swift from the project references and move on.
-
-If the build is successful, all you need to do is to start Jiraffe.app. Voila!
+Build the project using XCode. If the build is successful, all you need to do is to start Jiraffe.app. Voila!
 
 ## Usage
 
